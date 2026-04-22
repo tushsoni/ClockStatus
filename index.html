@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+<meta name="robots" content="noindex">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            background-color: #f5f7fa;
+            color: #1f2937;
+        }
+        
+        /* Header */
+        .header { 
+            background-color: #082047;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar { 
+            background-color: #082047;
+        }
+        
+        .sidebar i {
+            transition: all 0.2s;
+        }
+        
+        .sidebar i:hover {
+            color: #60a5fa;
+        }
+        
+        /* Tab Button Styling */
+        .tab-btn {
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+            position: relative;
+            background-color: transparent;
+            color: #6b7280;
+            border: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .tab-btn.inactive:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .tab-icon {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+        
+        /* Table Header */
+        .table-header {
+            background-color: #f0f4f8;
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid #d1d5db;
+            text-transform: none;
+            letter-spacing: normal;
+            border-top: 1px solid #d1d5db;
+        }
+
+        /* Filter Styles */
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            color: #4b5563;
+            height: 32px;
+        }
+        
+        .filter-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .filter-btn.active {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .filter-count {
+            margin-left: 6px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .active .filter-count {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        .offline-critical {
+            border-color: #fecaca;
+            color: #dc2626;
+            background-color: #fef2f2;
+        }
+        
+        .active.offline-critical {
+            background-color: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        /* Table Styling */
+        tr td {
+            color: #374151;
+            vertical-align: middle;
+            padding: 12px 16px;
+            border-bottom: 1px solid #d1d5db;
+            border-right: 1px solid #d1d5db;
+        }
+        
+        tr td:last-child {
+            border-right: none;
+        }
+        
+        tbody tr {
+            background-color: white;
+            transition: all 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Corporate pill styling */
+        .corporate-pill {
+            background-color: white;
+            color: #1f2937;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .corporate-pill:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Refresh Button */
+        .refresh-btn {
+            background-color: #3b82f6;
+            box-shadow: none;
+            transition: all 0.2s;
+            padding: 6px 18px !important;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 20px;
+            border: none;
+            height: 32px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #2563eb;
+        }
+
+        /* Export Button and Dropdown */
+        .export-btn {
+            background-color: white;
+            box-shadow: none;
+            transition: all 0.2s;
+            padding: 8px 18px !important;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .export-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .export-icon {
+            margin-right: 6px;
+            font-size: 13px;
+            color: #1f2937;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 150px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .dropdown-item i {
+            margin-right: 8px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Search Box */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .search-box:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 13px;
+            color: #374151;
+            width: 180px;
+            font-family: inherit;
+        }
+        
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .search-box i {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+
+        /* Add Button */
+        .add-btn {
+            background-color: #3b82f6;
+            box-shadow: none;
+            transition: all 0.2s;
+            padding: 8px 14px !important;
+            font-weight: 500;
+            font-size: 13px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        
+        .add-btn:hover {
+            background-color: #2563eb;
+        }
+        
+        /* Main Container */
+        .main-container {
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            overflow: hidden;
+        }
+        
+        /* Header Section */
+        .content-header {
+            border-bottom: 1px solid #e5e7eb;
+            background-color: white;
+            padding: 0;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .action-icon:hover {
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        th {
+            padding: 12px 16px !important;
+        }
+
+        thead {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <header class="header text-white px-6 py-3 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-8">
+            <div class="flex items-center">
+                <!-- App Icon -->
+                <div class="w-8 h-8 rounded mr-4 flex items-center justify-center">
+                    <img src="https://agcdn.altametrics.com/releaseHubWorks/agassets/v3/assets/images/common/zipSchedule.png" alt="App Logo" class="w-full h-full object-contain">
+                </div>
+                <!-- Navigation Items -->
+                <nav class="flex items-center space-x-8 text-[13px]">
+                    <div class="flex items-center cursor-pointer hover:text-gray-300 transition-colors">
+                        <i class="fas fa-th-large mr-2 text-[13px]"></i>
+                        <span class="font-medium">My Apps</span>
+                        <i class="fas fa-caret-down ml-2 text-[10px] opacity-70"></i>
+                    </div>
+                    <a href="#" class="flex items-center text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-home mr-2 text-[13px]"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center text-white transition-colors font-medium">
+                        <i class="fas fa-map-marked-alt mr-2 text-[13px]"></i>
+                        <span>Site Clock</span>
+                    </a>
+                    <div class="flex items-center cursor-pointer text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-chart-bar mr-2 text-[13px]"></i>
+                        <span>Growth</span>
+                        <i class="fas fa-caret-down ml-2 text-[10px] opacity-70"></i>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Center Section -->
+        <div class="flex items-center text-[12px] text-gray-300 space-x-3 mx-auto">
+            <div class="flex items-center cursor-pointer hover:text-white">
+                <i class="fas fa-cloud-sun text-[14px] mr-1.5"></i>
+                <i class="fas fa-caret-down text-[10px]"></i>
+            </div>
+            <div class="h-4 w-px bg-white/20"></div>
+            <div class="flex flex-col leading-tight">
+                <span class="text-white font-semibold">07:57<sup>A</sup></span>
+                <span class="text-[10px]">AMERICA/LOS ANGELES</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-5">
+            <!-- Corporate Selector -->
+            <div class="corporate-pill cursor-pointer">
+                <i class="fas fa-store text-blue-400 mr-2"></i>
+                <span>Corporate</span>
+                <i class="fas fa-caret-down ml-2 text-gray-500 text-[10px]"></i>
+            </div>
+
+            <!-- Settings and Profile -->
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-cog text-gray-300 cursor-pointer hover:text-white text-[16px]"></i>
+                <div class="w-8 h-8 rounded-full border border-white/30 overflow-hidden cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=TS&background=3b82f6&color=fff" alt="User Profile" class="w-full h-full">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar w-12 flex flex-col items-center py-4 space-y-6 text-gray-400 shrink-0">
+            <i class="fas fa-home text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <i class="fas fa-calendar-alt text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <i class="fas fa-users text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <i class="fas fa-briefcase text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <i class="fas fa-desktop text-sm text-blue-400 cursor-pointer"></i>
+            <i class="fas fa-user-circle text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <div class="flex-grow"></div>
+            <i class="fas fa-cog text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+            <i class="fas fa-headphones text-sm hover:text-blue-400 cursor-pointer transition-colors"></i>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 overflow-y-auto" style="background-color: #f5f7fa;">
+            <div class="main-container">
+                
+                <div class="content-header">
+                    <div class="tab-container px-6 py-3" style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+                        <div class="flex items-center space-x-3">
+                            <div onclick="setFilter('Offline6')" id="filter-offline6" class="filter-btn offline-critical active">
+                                Offline > 6 Hours <span class="filter-count" id="count-offline6">0</span>
+                            </div>
+                            <div onclick="setFilter('all')" id="filter-all" class="filter-btn">
+                                All <span class="filter-count" id="count-all">0</span>
+                            </div>
+                            <div onclick="setFilter('Online')" id="filter-online" class="filter-btn">
+                                Online <span class="filter-count" id="count-online">0</span>
+                            </div>
+                            <div onclick="setFilter('Offline')" id="filter-offline" class="filter-btn">
+                                Offline <span class="filter-count" id="count-offline">0</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
+                            </div>
+                            <button class="refresh-btn text-white flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i> Refresh
+                            </button>
+                            <div class="relative" style="position: relative;">
+                                <button class="export-btn" id="exportBtn" onclick="toggleExportMenu()">
+                                    <i class="fas fa-print export-icon"></i>
+                                    <i class="fas fa-caret-down ml-1" style="font-size: 10px;"></i>
+                                </button>
+                                <div class="dropdown-menu" id="exportMenu">
+                                    <button class="dropdown-item" onclick="exportToCSV()">
+                                        <i class="fas fa-file-csv"></i> Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left" style="border-collapse: collapse;">
+                        <thead>
+                            <tr class="table-header">
+                                <th class="px-6 py-3">Franchisee Name</th>
+                                <th class="px-6 py-3">Site Name</th>
+                                <th class="px-6 py-3">Device Type</th>
+                                <th class="px-6 py-3">Device Name</th>
+                                <th class="px-6 py-3">Device ID</th>
+                                <th class="px-6 py-3">Version</th>
+                                <th class="px-6 py-3">Last Sync. Time</th>
+                                <th class="px-6 py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody style="border-collapse: collapse;" id="deviceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const SHARED_DEVICE_ID = "67cb3706-3b7b-4af5-9beb-fb9fbddfc967";
+
+        const sites = [
+            { franchisee: "Premier Retail Group", site: "001 - Mission Bay", device: "Clock 1", type: "tablet", status: "Online", sync: "7 mins ago", version: "v 11.1.8", notify: true, canUpdateNotify: true },
+            { franchisee: "Premier Retail Group", site: "004 - Point Loma", device: "Clock 1", type: "tablet", status: "Online", sync: "10 mins ago", version: "v 11.1.8", notify: false, canUpdateNotify: false },
+            { franchisee: "Premier Retail Group", site: "007 - Encinitas", device: "WEB CLOCK 1", type: "desktop", status: "Online", sync: "14 mins ago", version: "", notify: true, canUpdateNotify: true },
+            { franchisee: "SouthCoast Franchise Co.", site: "008 - El Cajon - Magnolia", device: "WEB CLOCK 1", type: "desktop", status: "Offline", sync: "4 hrs 20 mins ago", version: "", notify: true, canUpdateNotify: true },
+            { franchisee: "SouthCoast Franchise Co.", site: "009 - Kearny Mesa - Clrmnt Me", device: "Clock 1", type: "tablet", status: "Online", sync: "7 mins ago", version: "v 11.1.8", notify: true, canUpdateNotify: false },
+            { franchisee: "SouthCoast Franchise Co.", site: "012 - Irvine", device: "Clock 1", type: "tablet", status: "Online", sync: "2 mins ago", version: "v 11.1.8", notify: true, canUpdateNotify: true },
+            { franchisee: "Valley Time Solutions", site: "015 - Carmel Mountain", device: "Clock 1", type: "tablet", status: "Online", sync: "5 mins ago", version: "v 11.1.8", notify: false, canUpdateNotify: true },
+            { franchisee: "Valley Time Solutions", site: "016 - Temecula-Ynez", device: "Clock 1", type: "tablet", status: "Online", sync: "8 mins ago", version: "v 11.1.8", notify: false, canUpdateNotify: false },
+            { franchisee: "Valley Time Solutions", site: "017 - Costa Mesa", device: "Clock 1", type: "tablet", status: "Online", sync: "5 mins ago", version: "v 11.1.8", notify: true, canUpdateNotify: true },
+            { franchisee: "Coastal Management Inc.", site: "018 - Laguna Niguel", device: "Clock 1", type: "tablet", status: "Offline", sync: "12 hrs ago", version: "v 11.1.8", notify: false, canUpdateNotify: true },
+            { franchisee: "Coastal Management Inc.", site: "019 - Anaheim", device: "Clock 1", type: "tablet", status: "Online", sync: "5 mins ago", version: "v 11.1.8", notify: false, canUpdateNotify: true }
+        ];
+
+        let currentFilter = 'Offline6';
+        let currentSearchTerm = '';
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            renderTable();
+            updateFilterButtons();
+        }
+
+        function handleSearch() {
+            currentSearchTerm = document.getElementById('searchInput').value.toLowerCase();
+            renderTable();
+        }
+
+        function updateFilterButtons() {
+            const filters = ['all', 'online', 'offline', 'offline6'];
+            filters.forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (btn) {
+                    if (currentFilter.toLowerCase() === f) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+        }
+
+        function isOfflineOver6Hrs(syncStr) {
+            if (syncStr.includes('hrs')) return parseInt(syncStr) > 6;
+            if (syncStr.includes(':')) return parseInt(syncStr.split(':')[0]) > 6;
+            return false;
+        }
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.toggle('active');
+        }
+
+        function exportToCSV() {
+            const headers = ['Franchisee Name', 'Site Name', 'Device Type', 'Device Name', 'Device ID', 'Version', 'Last Sync. Time', 'Status'];
+            const rows = [];
+            
+            // Add headers
+            rows.push(headers.join(','));
+            
+            // Add all data
+            sites.forEach(site => {
+                const row = [
+                    `"${site.franchisee}"`,
+                    `"${site.site}"`,
+                    `"${site.type}"`,
+                    `"${site.device}"`,
+                    `"${SHARED_DEVICE_ID}"`,
+                    `"${site.version}"`,
+                    `"${site.sync}"`,
+                    `"${site.status}"`
+                ];
+                rows.push(row.join(','));
+            });
+            
+            const csv = rows.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `device-status-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            // Close dropdown
+            document.getElementById('exportMenu').classList.remove('active');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const exportBtn = document.getElementById('exportBtn');
+            const exportMenu = document.getElementById('exportMenu');
+            if (exportBtn && exportMenu) {
+                if (!exportBtn.contains(event.target) && !exportMenu.contains(event.target)) {
+                    exportMenu.classList.remove('active');
+                }
+            }
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('deviceTableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('count-all').innerText = sites.length;
+            document.getElementById('count-online').innerText = sites.filter(s => s.status === 'Online').length;
+            document.getElementById('count-offline').innerText = sites.filter(s => s.status === 'Offline').length;
+            document.getElementById('count-offline6').innerText = sites.filter(s => s.status === 'Offline' && isOfflineOver6Hrs(s.sync)).length;
+
+            const filteredSites = sites.filter(site => {
+                // Apply status filter
+                let statusMatch = true;
+                if (currentFilter === 'all') statusMatch = true;
+                else if (currentFilter === 'Offline6') statusMatch = site.status === 'Offline' && isOfflineOver6Hrs(site.sync);
+                else statusMatch = site.status === currentFilter;
+                
+                // Apply search filter
+                if (!currentSearchTerm) return statusMatch;
+                
+                const searchableText = `${site.franchisee} ${site.site} ${site.device} ${site.type} ${site.status} ${site.version}`.toLowerCase();
+                return statusMatch && searchableText.includes(currentSearchTerm);
+            });
+
+            filteredSites.forEach(site => {
+                const row = document.createElement('tr');
+                row.style.cssText = "background-color: white; border-bottom: 1px solid #e5e7eb;";
+                row.onmouseover = function() { this.style.backgroundColor = "#f9fafb"; }
+                row.onmouseout = function() { this.style.backgroundColor = "white"; }
+                
+                const tabletSvg = `<svg width="28" height="20" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="36" height="24" rx="2" fill="white" stroke="#9ca3af" stroke-width="1.5"/>
+                    <rect x="6" y="6" width="28" height="16" fill="#f3f4f6"/>
+                    <circle cx="36" cy="14" r="1" fill="#9ca3af"/>
+                </svg>`;
+                
+                const desktopSvg = `<svg width="28" height="20" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="2" width="32" height="20" rx="1" fill="white" stroke="#9ca3af" stroke-width="1.5"/>
+                    <path d="M14 22L12 26H28L26 22H14Z" fill="#9ca3af"/>
+                    <rect x="8" y="6" width="24" height="12" fill="#f3f4f6"/>
+                </svg>`;
+
+                const deviceIcon = site.type === 'tablet' ? tabletSvg : desktopSvg;
+                const statusColor = site.status === 'Online' ? '#10b981' : '#ef4444';
+
+                row.innerHTML = `
+                    <td style="padding: 12px 16px; color: #374151; font-weight: 500; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${site.franchisee}</td>
+                    <td style="padding: 12px 16px; color: #374151; font-weight: 500; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${site.site}</td>
+                    <td style="padding: 12px 16px; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${deviceIcon}</td>
+                    <td style="padding: 12px 16px; color: #374151; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${site.device}</td>
+                    <td style="padding: 12px 16px; color: #3b82f6; font-family: monospace; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${SHARED_DEVICE_ID}</td>
+                    <td style="padding: 12px 16px; color: #6b7280; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${site.version || '—'}</td>
+                    <td style="padding: 12px 16px; color: #6b7280; font-size: 12px; border-bottom: 1px solid #e5e7eb;">${site.sync}</td>
+                    <td style="padding: 12px 16px; text-align: right; font-size: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <div class="flex items-center" style="background-color: ${site.status === 'Online' ? '#f0fdf4' : '#fef2f2'}; border-radius: 4px; padding: 4px 8px;">
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background-color: ${statusColor}; margin-right: 6px;"></div>
+                            <span style="color: ${statusColor}; font-weight: 500; font-size: 12px;">${site.status}</span>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        renderTable();
+        updateFilterButtons();
+    </script>
+</body>
+</html>
